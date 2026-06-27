@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BE Abundant Client Onboarding</title>
+  <style>
+    :root {
+      --bg:#0d0c08; --nav:#0b0a07; --panel:#1f1b14; --gold:#d5ab4b;
+      --gold2:#f0cf7c; --text:#f5efe4; --muted:#8f8374; --line:#3a3022;
+      --error:#ff7b7b;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font-family:Arial, Helvetica, sans-serif; }
+    .nav { height:74px; background:rgba(9,8,5,.95); border-bottom:1px solid #1d1911; display:flex; align-items:center; justify-content:space-between; padding:0 7vw; position:sticky; top:0; z-index:10; }
+    .brand { font-family:Georgia, "Times New Roman", serif; color:var(--gold); font-size:25px; font-weight:700; }
+    .nav-links { display:flex; gap:34px; align-items:center; color:#7f7464; text-transform:uppercase; letter-spacing:1.8px; font-size:11px; font-weight:700; }
+    .nav-btn { background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#151006; padding:13px 22px; border-radius:2px; font-size:13px; font-weight:900; text-decoration:none; text-transform:none; letter-spacing:0; }
+    .page { padding:72px 16px 90px; background:radial-gradient(circle at 50% 0%, rgba(213,171,75,.12), transparent 28%), linear-gradient(180deg,#11100b 0%, #0c0b08 42%, #0d0c08 100%); }
+    .intro { max-width:780px; margin:0 auto 42px; text-align:center; }
+    .kicker { display:flex; align-items:center; justify-content:center; gap:16px; color:var(--gold); text-transform:uppercase; letter-spacing:3px; font-size:11px; font-weight:800; margin-bottom:18px; }
+    .kicker:before,.kicker:after { content:""; width:66px; height:1px; background:var(--gold); opacity:.65; }
+    h1 { margin:0; font-family:Georgia, "Times New Roman", serif; font-size:46px; line-height:1.08; font-weight:400; color:var(--text); }
+    h1 em { color:var(--gold); font-style:italic; }
+    .intro p { max-width:620px; margin:18px auto 0; color:var(--muted); line-height:1.65; font-size:15px; }
+    .shell { max-width:980px; margin:0 auto; border:1px solid var(--line); background:var(--panel); display:grid; grid-template-columns:250px 1fr; min-height:570px; box-shadow:0 18px 60px rgba(0,0,0,.35); }
+    .side { border-right:1px solid var(--line); background:linear-gradient(180deg,#251f15,#1a1710); padding:42px 34px; }
+    .side-label { color:var(--gold); text-transform:uppercase; letter-spacing:2.6px; font-size:11px; font-weight:800; margin-bottom:32px; }
+    .price { margin:22px 0 4px; display:flex; align-items:flex-start; gap:6px; color:var(--gold); font-family:Georgia, "Times New Roman", serif; font-size:58px; line-height:1; }
+    .price span { font-size:19px; margin-top:8px; }
+    .side-copy { color:var(--muted); font-size:13px; line-height:1.5; max-width:150px; }
+    .side-steps { margin-top:42px; display:grid; gap:14px; }
+    .side-step { display:flex; gap:10px; align-items:center; color:#786f61; font-size:12px; }
+    .dot { width:7px; height:7px; border-radius:50%; background:#4b4030; }
+    .side-step.active { color:var(--gold2); }
+    .side-step.active .dot { background:var(--gold); box-shadow:0 0 0 4px rgba(213,171,75,.12); }
+    .main { padding:44px 36px 34px; background:var(--panel); }
+    .progress-row { display:flex; align-items:center; gap:14px; margin-bottom:30px; }
+    .progress-copy { color:#8c8070; text-transform:uppercase; letter-spacing:2px; font-size:10px; font-weight:900; white-space:nowrap; }
+    .bar { width:100%; height:3px; background:#332b1f; overflow:hidden; }
+    .bar span { display:block; width:0%; height:100%; background:var(--gold); transition:width .25s ease; }
+    .screen { display:none; }
+    .screen.active { display:block; animation:fade .18s ease; }
+    @keyframes fade { from { opacity:.25; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+    h2 { font-family:Georgia, "Times New Roman", serif; font-size:38px; line-height:1.08; font-weight:400; margin:0 0 14px; color:var(--text); }
+    h2 em { color:var(--gold); font-style:italic; }
+    .desc { color:var(--muted); line-height:1.65; font-size:15px; margin:0 0 26px; max-width:580px; }
+    .mini-grid { display:grid; grid-template-columns:repeat(3,1fr); border:1px solid var(--line); margin:28px 0 0; }
+    .mini { padding:20px 18px; border-right:1px solid var(--line); background:#201b13; }
+    .mini:last-child { border-right:0; }
+    .mini strong { display:block; color:var(--gold); font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+    .mini span { color:var(--muted); font-size:13px; line-height:1.45; }
+    label { display:block; color:#d8cdbc; font-size:13px; font-weight:800; margin:18px 0 8px; }
+    input, textarea, select { width:100%; background:#15130d; border:1px solid #3b3122; color:var(--text); border-radius:2px; padding:15px 14px; font-size:15px; outline:none; font-family:Arial, Helvetica, sans-serif; }
+    input::placeholder, textarea::placeholder { color:#6c6255; }
+    textarea { min-height:118px; resize:vertical; }
+    input:focus, textarea:focus, select:focus { border-color:var(--gold); box-shadow:0 0 0 2px rgba(213,171,75,.12); }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .options { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-top:20px; }
+    .option { background:#17140e; border:1px solid #30291d; min-height:138px; padding:20px 14px; text-align:center; cursor:pointer; transition:.18s ease; }
+    .option:hover { border-color:rgba(213,171,75,.7); transform:translateY(-1px); }
+    .option.selected { border-color:var(--gold); background:#221c12; }
+    .option .ico { font-size:22px; margin-bottom:16px; }
+    .option strong { display:block; font-size:13px; color:#f2eadc; line-height:1.35; margin-bottom:8px; }
+    .option small { display:block; font-size:11px; color:#8b806f; line-height:1.45; }
+    .note { border-left:2px solid var(--gold); background:#2a2419; padding:16px 18px; color:#958a7a; line-height:1.6; font-size:13px; margin-top:24px; }
+    .error { display:none; color:var(--error); font-size:13px; font-weight:800; margin-top:14px; }
+    .buttons { display:flex; justify-content:space-between; gap:14px; margin-top:34px; }
+    button { appearance:none; border:0; cursor:pointer; font-weight:900; font-size:14px; padding:16px 26px; border-radius:2px; }
+    .primary { background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#151006; }
+    .secondary { background:transparent; color:var(--gold); border:1px solid #604c25; }
+    .summary { background:#15130d; border:1px solid var(--line); padding:22px; color:#cfc3b1; white-space:pre-wrap; font-size:13px; line-height:1.75; max-height:340px; overflow:auto; }
+    .footer-strip { max-width:980px; margin:24px auto 0; display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--line); background:#211c14; }
+    .benefit { padding:18px 20px; border-right:1px solid var(--line); }
+    .benefit:last-child { border-right:0; }
+    .benefit strong { display:block; color:var(--gold); font-size:12px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+    .benefit span { color:var(--muted); font-size:12px; line-height:1.45; }
+    @media(max-width:900px) {
+      .nav { padding:0 22px; } .nav-links { display:none; } .shell { grid-template-columns:1fr; }
+      .side { border-right:0; border-bottom:1px solid var(--line); padding:28px; }
+      .side-steps { grid-template-columns:repeat(3,1fr); margin-top:24px; }
+      .options { grid-template-columns:1fr 1fr; } .footer-strip { grid-template-columns:1fr 1fr; }
+    }
+    @media(max-width:620px) {
+      .page { padding-top:46px; } h1 { font-size:35px; } h2 { font-size:31px; } .main { padding:34px 22px; }
+      .two, .options, .mini-grid, .footer-strip { grid-template-columns:1fr; }
+      .mini, .benefit { border-right:0; border-bottom:1px solid var(--line); }
+      .mini:last-child, .benefit:last-child { border-bottom:0; }
+      .buttons { flex-direction:column-reverse; } button { width:100%; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="brand">Be Abundant</div>
+    <div class="nav-links"><span>Entry Offer</span><span>Packages</span><span>Contact</span><a class="nav-btn" href="#">Start at $199</a></div>
+  </nav>
+
+  <main class="page">
+    <section class="intro">
+      <div class="kicker">Client Onboarding</div>
+      <h1>Let’s get aligned so we can <em>move with clarity.</em></h1>
+      <p>Answer a few quick questions so BE Abundant knows what to build, what to avoid, and what success should look like for your business.</p>
+    </section>
+
+    <section class="shell">
+      <aside class="side">
+        <div class="side-label">Starter Package</div>
+        <div class="price"><span>$</span>199</div>
+        <div class="side-copy">Choose 1 service. Complete onboarding. We prepare the next step.</div>
+        <div class="side-steps" id="sideSteps">
+          <div class="side-step active"><span class="dot"></span> Welcome</div>
+          <div class="side-step"><span class="dot"></span> Contact</div>
+          <div class="side-step"><span class="dot"></span> Business</div>
+          <div class="side-step"><span class="dot"></span> Service</div>
+          <div class="side-step"><span class="dot"></span> Goals</div>
+          <div class="side-step"><span class="dot"></span> Brand</div>
+          <div class="side-step"><span class="dot"></span> Submit</div>
+        </div>
+      </aside>
+
+      <section class="main">
+        <div class="progress-row"><div class="progress-copy" id="stepText">Step 1 of 7</div><div class="bar"><span id="progressBar"></span></div></div>
+
+        <section class="screen active" data-step="0">
+          <h2>Welcome to <em>BE Abundant.</em></h2>
+          <p class="desc">This onboarding takes about 3–5 minutes. Your answers will open in an email at the end so you can send everything directly to us.</p>
+          <div class="mini-grid">
+            <div class="mini"><strong>01 Save Time</strong><span>No broken form or survey setup.</span></div>
+            <div class="mini"><strong>02 Stay Clear</strong><span>We get the core details in one place.</span></div>
+            <div class="mini"><strong>03 Move Fast</strong><span>You submit and we know what to do next.</span></div>
+          </div>
+          <div class="note">No GHL form. No survey. No login. This is a custom guided onboarding page.</div>
+          <div class="buttons"><span></span><button class="primary" onclick="nextStep()">Start Onboarding →</button></div>
+        </section>
+
+        <section class="screen" data-step="1">
+          <h2>Who are we <em>working with?</em></h2>
+          <p class="desc">Add your basic contact details so we can match your onboarding with your payment.</p>
+          <div class="two"><div><label>Full Name *</label><input id="fullName" placeholder="Your full name"></div><div><label>Email *</label><input id="email" type="email" placeholder="you@email.com"></div></div>
+          <label>Phone</label><input id="phone" placeholder="Your phone number">
+          <div class="error" id="error1">Please enter your full name and email.</div>
+          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" onclick="validateStep1()">Continue →</button></div>
+        </section>
+
+        <section class="screen" data-step="2">
+          <h2>Tell us about <em>your business.</em></h2>
+          <p class="desc">Give us the core details we need to understand your brand and audience.</p>
+          <label>Business Name *</label><input id="businessName" placeholder="Your business name">
+          <label>Website or main link</label><input id="website" placeholder="https://">
+          <label>Social media pages</label><textarea id="socials" placeholder="Instagram, Facebook, TikTok, LinkedIn, YouTube, etc."></textarea>
+          <label>Briefly describe your business *</label><textarea id="businessDescription" placeholder="What do you sell, who do you serve, and what do people come to you for?"></textarea>
+          <div class="error" id="error2">Please enter your business name and business description.</div>
+          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" onclick="validateStep2()">Continue →</button></div>
+        </section>
+
+        <section class="screen" data-step="3">
+          <h2>Choose your <em>starter service.</em></h2>
+          <p class="desc">Pick the service you purchased or want us to tackle first.</p>
+          <div class="options">
+            <div class="option" data-value="Content Starter"><div class="ico">✏️</div><strong>Content Starter</strong><small>Posts, captions, reel support, scheduling.</small></div>
+            <div class="option" data-value="Follow-Up Setup"><div class="ico">⚙️</div><strong>Follow-Up Setup</strong><small>Lead form, auto-reply, missed-call text.</small></div>
+            <div class="option" data-value="Email Automation"><div class="ico">📧</div><strong>Email Automation</strong><small>Welcome sequence and nurture workflow.</small></div>
+            <div class="option" data-value="AI Chatbot Setup"><div class="ico">🤖</div><strong>AI Chatbot Setup</strong><small>Basic chatbot for website or social page.</small></div>
+            <div class="option" data-value="Funnel / Landing Page"><div class="ico">🖥️</div><strong>Funnel / Landing Page</strong><small>One page to capture leads or sell.</small></div>
+          </div>
+          <div class="error" id="error3">Please select a service.</div>
+          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" onclick="validateStep3()">Continue →</button></div>
+        </section>
+
+        <section class="screen" data-step="4">
+          <h2>What result are we <em>building toward?</em></h2>
+          <p class="desc">This is where we make sure the work is pointed at the right outcome.</p>
+          <label>Main goal for this service *</label><textarea id="mainGoal" placeholder="Example: get more leads, automate follow-up, launch an offer, create content, etc."></textarea>
+          <label>Who is your ideal client or customer?</label><textarea id="idealClient" placeholder="Describe who you want to reach."></textarea>
+          <label>What would make this feel successful?</label><textarea id="successMeasure" placeholder="What result would make this worth it?"></textarea>
+          <div class="error" id="error4">Please enter your main goal.</div>
+          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" onclick="validateStep4()">Continue →</button></div>
+        </section>
+
+        <section class="screen" data-step="5">
+          <h2>Share your <em>brand direction.</em></h2>
+          <p class="desc">This helps us stay aligned with your voice and avoid anything that doesn’t fit.</p>
+          <label>What tone should we use?</label><select id="tone"><option value="">Select one</option><option>Bold and direct</option><option>Professional</option><option>Warm and conversational</option><option>Faith-based</option><option>Luxury / premium</option><option>Funny / relatable</option><option>Educational</option><option>Other</option></select>
+          <label>Do you have brand assets?</label><textarea id="brandAssets" placeholder="Logo, brand colors, brand guide, photos, videos, inspiration links, etc. You can attach files when the email opens."></textarea>
+          <label>Anything we should avoid?</label><textarea id="avoid" placeholder="Words, colors, design styles, topics, or anything you do not want used."></textarea>
+          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" onclick="nextStep()">Review →</button></div>
+        </section>
+
+        <section class="screen" data-step="6">
+          <h2>Review and <em>send.</em></h2>
+          <p class="desc">When you click submit, your email app opens with these answers already written. Attach files there, then click send.</p>
+          <div class="summary" id="summaryBox"></div>
+          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" onclick="submitEmail()">Open Email to Submit →</button></div>
+        </section>
+      </section>
+    </section>
+
+    <section class="footer-strip">
+      <div class="benefit"><strong>⚡ Save Time</strong><span>Free yourself from overwhelm immediately.</span></div>
+      <div class="benefit"><strong>📅 Stay Consistent</strong><span>We keep your content and systems moving.</span></div>
+      <div class="benefit"><strong>📈 Get More Leads</strong><span>Better systems. Better follow-up.</span></div>
+      <div class="benefit"><strong>🎯 Focus on Growth</strong><span>We handle the rest behind the scenes.</span></div>
+    </section>
+  </main>
+
+  <script>
+    let currentStep = 0;
+    let selectedService = "";
+    const totalSteps = 7;
+
+    function showStep(step) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.querySelector('[data-step="' + step + '"]').classList.add("active");
+      currentStep = step;
+      const percent = Math.round(((step + 1) / totalSteps) * 100);
+      document.getElementById("stepText").innerText = "Step " + (step + 1) + " of " + totalSteps;
+      document.getElementById("progressBar").style.width = percent + "%";
+      document.querySelectorAll(".side-step").forEach((s, i) => s.classList.toggle("active", i === step));
+      if (step === 6) document.getElementById("summaryBox").innerText = buildAnswers();
+    }
+    function nextStep() { if (currentStep < totalSteps - 1) showStep(currentStep + 1); }
+    function prevStep() { if (currentStep > 0) showStep(currentStep - 1); }
+    function val(id) { return document.getElementById(id).value.trim(); }
+    function hideErrors() { document.querySelectorAll(".error").forEach(e => e.style.display = "none"); }
+    function validateStep1() { hideErrors(); if (!val("fullName") || !val("email")) { document.getElementById("error1").style.display = "block"; return; } nextStep(); }
+    function validateStep2() { hideErrors(); if (!val("businessName") || !val("businessDescription")) { document.getElementById("error2").style.display = "block"; return; } nextStep(); }
+    function validateStep3() { hideErrors(); if (!selectedService) { document.getElementById("error3").style.display = "block"; return; } nextStep(); }
+    function validateStep4() { hideErrors(); if (!val("mainGoal")) { document.getElementById("error4").style.display = "block"; return; } nextStep(); }
+
+    document.querySelectorAll(".option").forEach(option => {
+      option.addEventListener("click", () => {
+        document.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+        option.classList.add("selected");
+        selectedService = option.dataset.value;
+      });
+    });
+
+    function buildAnswers() {
+      return `BE Abundant Client Onboarding Answers
+
+CONTACT
+Full Name: ${val("fullName")}
+Email: ${val("email")}
+Phone: ${val("phone")}
+
+BUSINESS
+Business Name: ${val("businessName")}
+Website/Main Link: ${val("website")}
+Social Media Pages:
+${val("socials")}
+
+Business Description:
+${val("businessDescription")}
+
+SERVICE
+Service Purchased: ${selectedService}
+
+GOALS
+Main Goal:
+${val("mainGoal")}
+
+Ideal Client/Customer:
+${val("idealClient")}
+
+Success Measure:
+${val("successMeasure")}
+
+BRAND
+Tone:
+${val("tone")}
+
+Brand Assets:
+${val("brandAssets")}
+
+Anything to Avoid:
+${val("avoid")}
+
+FILES
+Please attach any logo, brand guide, photos, videos, screenshots, or inspiration files to this email before sending.`;
+    }
+
+    function submitEmail() {
+      const subject = encodeURIComponent("BE Abundant Client Onboarding - " + (val("businessName") || val("fullName")));
+      const body = encodeURIComponent(buildAnswers());
+      window.location.href = `mailto:hello@youbeabundant.com?subject=${subject}&body=${body}`;
+    }
+
+    showStep(0);
+  </script>
+</body>
+</html>
