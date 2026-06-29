@@ -124,13 +124,13 @@
 
         <section class="screen active" data-step="0">
           <h2>Welcome to <em>BE Abundant.</em></h2>
-          <p class="desc">This onboarding takes about 3–5 minutes. Your answers will be submitted securely so BE Abundant can prepare your next step.</p>
+          <p class="desc">This onboarding takes about 3–5 minutes. Your answers will open in an email at the end so you can send everything directly to us.</p>
           <div class="mini-grid">
             <div class="mini"><strong>01 Save Time</strong><span>No broken form or survey setup.</span></div>
             <div class="mini"><strong>02 Stay Clear</strong><span>We get the core details in one place.</span></div>
             <div class="mini"><strong>03 Move Fast</strong><span>You submit and we know what to do next.</span></div>
           </div>
-          <div class="note">Your answers will be saved to your BE Abundant client profile after submission.</div>
+          <div class="note">No GHL form. No survey. No login. This is a custom guided onboarding page.</div>
           <div class="buttons"><span></span><button class="primary" onclick="nextStep()">Start Onboarding →</button></div>
         </section>
 
@@ -189,10 +189,9 @@
 
         <section class="screen" data-step="6">
           <h2>Review and <em>send.</em></h2>
-          <p class="desc">Review your answers, then submit your onboarding. We will receive your details and prepare your next step.</p>
+          <p class="desc">When you click submit, your email app opens with these answers already written. Attach files there, then click send.</p>
           <div class="summary" id="summaryBox"></div>
-          <div class="error" id="submitError">Something went wrong. Please try again or contact BE Abundant.</div>
-          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" id="submitBtn" onclick="submitWebhook()">Submit Onboarding →</button></div>
+          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" onclick="submitEmail()">Open Email to Submit →</button></div>
         </section>
       </section>
     </section>
@@ -281,61 +280,10 @@ FILES
 Please attach any logo, brand guide, photos, videos, screenshots, or inspiration files to this email before sending.`;
     }
 
-    const GHL_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/6i2HV4qUyFoG6Bq0dydB/webhook-trigger/ldc7zCiEZPacSKT5vdgn";
-
-    function getPayload() {
-      return {
-        fullName: val("fullName"),
-        email: val("email"),
-        phone: val("phone"),
-        businessName: val("businessName"),
-        website: val("website"),
-        socialMediaPages: val("socials"),
-        businessDescription: val("businessDescription"),
-        selectedService: selectedService,
-        mainGoal: val("mainGoal"),
-        idealClient: val("idealClient"),
-        successMeasure: val("successMeasure"),
-        tone: val("tone"),
-        brandAssets: val("brandAssets"),
-        avoid: val("avoid"),
-        onboardingSummary: buildAnswers(),
-        submittedAt: new Date().toISOString(),
-        source: "BE Abundant Onboarding Page"
-      };
-    }
-
-    async function submitWebhook() {
-      hideErrors();
-
-      if (GHL_WEBHOOK_URL === "PASTE_YOUR_GHL_WEBHOOK_URL_HERE") {
-        alert("Add your GHL webhook URL inside the code before publishing.");
-        return;
-      }
-
-      const submitBtn = document.getElementById("submitBtn");
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Submitting...";
-
-      try {
-        const response = await fetch(GHL_WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(getPayload())
-        });
-
-        if (!response.ok) throw new Error("Webhook failed");
-
-        document.querySelector(".main").innerHTML = `
-          <h2>You're all <em>set.</em></h2>
-          <p class="desc">Thank you for completing your onboarding. BE Abundant received your details and will follow up with your next steps.</p>
-          <div class="note">You can now close this page.</div>
-        `;
-      } catch (error) {
-        document.getElementById("submitError").style.display = "block";
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Submit Onboarding →";
-      }
+    function submitEmail() {
+      const subject = encodeURIComponent("BE Abundant Client Onboarding - " + (val("businessName") || val("fullName")));
+      const body = encodeURIComponent(buildAnswers());
+      window.location.href = `mailto:hello@youbeabundant.com?subject=${subject}&body=${body}`;
     }
 
     showStep(0);
