@@ -130,7 +130,7 @@
             <div class="mini"><strong>02 Stay Clear</strong><span>We get the core details in one place.</span></div>
             <div class="mini"><strong>03 Move Fast</strong><span>You submit and we know what to do next.</span></div>
           </div>
-          <div class="note">No GHL form. No survey. No login. This is a custom guided onboarding page.</div>
+          <div class="note">Every great result starts with clarity. Take a few minutes to answer the questions ahead so our team can understand your business, your goals, and your brand before we begin.</div>
           <div class="buttons"><span></span><button class="primary" onclick="nextStep()">Start Onboarding →</button></div>
         </section>
 
@@ -189,9 +189,9 @@
 
         <section class="screen" data-step="6">
           <h2>Review and <em>send.</em></h2>
-          <p class="desc">When you click submit, your email app opens with these answers already written. Attach files there, then click send.</p>
+          <p class="desc">When you click submit, your email app will open with your answers already filled in. Attach any logos, brand assets, or inspiration files before sending.</p>
           <div class="summary" id="summaryBox"></div>
-          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" onclick="submitEmail()">Open Email to Submit →</button></div>
+          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" onclick="submitEmail()">Send My Onboarding →</button></div>
         </section>
       </section>
     </section>
@@ -283,7 +283,7 @@ Please attach any logo, brand guide, photos, videos, screenshots, or inspiration
     function submitEmail() {
       const subject = encodeURIComponent("BE Abundant Client Onboarding - " + (val("businessName") || val("fullName")));
       const body = encodeURIComponent(buildAnswers());
-      window.location.href = `mailto:hello@youbeabundant.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:connect@youbeabundant.com?subject=${subject}&body=${body}`;
     }
 
     showStep(0);
