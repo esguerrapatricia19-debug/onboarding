@@ -68,6 +68,7 @@
     .buttons { display:flex; justify-content:space-between; gap:14px; margin-top:34px; }
     button { appearance:none; border:0; cursor:pointer; font-weight:900; font-size:14px; padding:16px 26px; border-radius:2px; }
     .primary { background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#151006; }
+    .primary:disabled { opacity:.6; cursor:not-allowed; }
     .secondary { background:transparent; color:var(--gold); border:1px solid #604c25; }
     .summary { background:#15130d; border:1px solid var(--line); padding:22px; color:#cfc3b1; white-space:pre-wrap; font-size:13px; line-height:1.75; max-height:340px; overflow:auto; }
     .footer-strip { max-width:980px; margin:24px auto 0; display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--line); background:#211c14; }
@@ -75,6 +76,8 @@
     .benefit:last-child { border-right:0; }
     .benefit strong { display:block; color:var(--gold); font-size:12px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
     .benefit span { color:var(--muted); font-size:12px; line-height:1.45; }
+    .success-icon { font-size:48px; margin-bottom:20px; }
+    .fallback-link { display:inline-block; margin-top:18px; color:var(--gold); font-size:13px; text-decoration:underline; }
     @media(max-width:900px) {
       .nav { padding:0 22px; } .nav-links { display:none; } .shell { grid-template-columns:1fr; }
       .side { border-right:0; border-bottom:1px solid var(--line); padding:28px; }
@@ -124,7 +127,7 @@
 
         <section class="screen active" data-step="0">
           <h2>Welcome to <em>BE Abundant.</em></h2>
-          <p class="desc">This onboarding takes about 3–5 minutes. Your answers will open in an email at the end so you can send everything directly to us.</p>
+          <p class="desc">This onboarding takes about 3–5 minutes. Your answers go straight to our team so we can prep your next step.</p>
           <div class="mini-grid">
             <div class="mini"><strong>01 Save Time</strong><span>No broken form or survey setup.</span></div>
             <div class="mini"><strong>02 Stay Clear</strong><span>We get the core details in one place.</span></div>
@@ -182,16 +185,24 @@
           <h2>Share your <em>brand direction.</em></h2>
           <p class="desc">This helps us stay aligned with your voice and avoid anything that doesn’t fit.</p>
           <label>What tone should we use?</label><select id="tone"><option value="">Select one</option><option>Bold and direct</option><option>Professional</option><option>Warm and conversational</option><option>Faith-based</option><option>Luxury / premium</option><option>Funny / relatable</option><option>Educational</option><option>Other</option></select>
-          <label>Do you have brand assets?</label><textarea id="brandAssets" placeholder="Logo, brand colors, brand guide, photos, videos, inspiration links, etc. You can attach files when the email opens."></textarea>
+          <label>Do you have brand assets?</label><textarea id="brandAssets" placeholder="Logo, brand colors, brand guide, photos, videos, inspiration links, etc. Email these to us separately if needed."></textarea>
           <label>Anything we should avoid?</label><textarea id="avoid" placeholder="Words, colors, design styles, topics, or anything you do not want used."></textarea>
           <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" onclick="nextStep()">Review →</button></div>
         </section>
 
         <section class="screen" data-step="6">
           <h2>Review and <em>send.</em></h2>
-          <p class="desc">When you click submit, your email app will open with your answers already filled in. Attach any logos, brand assets, or inspiration files before sending.</p>
+          <p class="desc">Check your answers below, then click submit to send everything straight to our team.</p>
           <div class="summary" id="summaryBox"></div>
-          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" onclick="submitEmail()">Send My Onboarding →</button></div>
+          <div class="error" id="errorSubmit">Something went wrong sending this. Please use the email link below instead, or try again.</div>
+          <div class="buttons"><button class="secondary" onclick="prevStep()">← Back</button><button class="primary" id="submitBtn" onclick="submitForm()">Send My Onboarding →</button></div>
+          <a class="fallback-link" id="fallbackLink" style="display:none;" href="#">Or click here to send via email instead</a>
+        </section>
+
+        <section class="screen" data-step="7">
+          <div class="success-icon">✅</div>
+          <h2>You're all <em>set.</em></h2>
+          <p class="desc">Thanks — your onboarding answers were sent to our team. We'll be in touch shortly with your next step.</p>
         </section>
       </section>
     </section>
@@ -205,21 +216,26 @@
   </main>
 
   <script>
+    // ⚠️ REPLACE THIS with your GHL Inbound Webhook URL (Automation → Workflows → Inbound Webhook trigger)
+    const WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/6i2HV4qUyFoG6Bq0dydB/webhook-trigger/ldc7zCiEZPacSKT5vdgn";
+
     let currentStep = 0;
     let selectedService = "";
-    const totalSteps = 7;
+    const totalSteps = 7; // confirmation screen (index 7) is not counted in the progress bar
 
     function showStep(step) {
       document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
       document.querySelector('[data-step="' + step + '"]').classList.add("active");
       currentStep = step;
-      const percent = Math.round(((step + 1) / totalSteps) * 100);
-      document.getElementById("stepText").innerText = "Step " + (step + 1) + " of " + totalSteps;
-      document.getElementById("progressBar").style.width = percent + "%";
-      document.querySelectorAll(".side-step").forEach((s, i) => s.classList.toggle("active", i === step));
+      if (step <= 6) {
+        const percent = Math.round(((step + 1) / totalSteps) * 100);
+        document.getElementById("stepText").innerText = "Step " + (step + 1) + " of " + totalSteps;
+        document.getElementById("progressBar").style.width = percent + "%";
+        document.querySelectorAll(".side-step").forEach((s, i) => s.classList.toggle("active", i === step));
+      }
       if (step === 6) document.getElementById("summaryBox").innerText = buildAnswers();
     }
-    function nextStep() { if (currentStep < totalSteps - 1) showStep(currentStep + 1); }
+    function nextStep() { if (currentStep < 6) showStep(currentStep + 1); }
     function prevStep() { if (currentStep > 0) showStep(currentStep - 1); }
     function val(id) { return document.getElementById(id).value.trim(); }
     function hideErrors() { document.querySelectorAll(".error").forEach(e => e.style.display = "none"); }
@@ -274,16 +290,60 @@ Brand Assets:
 ${val("brandAssets")}
 
 Anything to Avoid:
-${val("avoid")}
-
-FILES
-Please attach any logo, brand guide, photos, videos, screenshots, or inspiration files to this email before sending.`;
+${val("avoid")}`;
     }
 
-    function submitEmail() {
+    function buildPayload() {
+      return {
+        fullName: val("fullName"),
+        email: val("email"),
+        phone: val("phone"),
+        businessName: val("businessName"),
+        website: val("website"),
+        socials: val("socials"),
+        businessDescription: val("businessDescription"),
+        servicePurchased: selectedService,
+        mainGoal: val("mainGoal"),
+        idealClient: val("idealClient"),
+        successMeasure: val("successMeasure"),
+        tone: val("tone"),
+        brandAssets: val("brandAssets"),
+        avoid: val("avoid"),
+        source: "BE Abundant Onboarding Form"
+      };
+    }
+
+    function buildMailtoLink() {
       const subject = encodeURIComponent("BE Abundant Client Onboarding - " + (val("businessName") || val("fullName")));
       const body = encodeURIComponent(buildAnswers());
-      window.location.href = `mailto:connect@youbeabundant.com?subject=${subject}&body=${body}`;
+      return `mailto:connect@youbeabundant.com?subject=${subject}&body=${body}`;
+    }
+
+    async function submitForm() {
+      hideErrors();
+      const btn = document.getElementById("submitBtn");
+      btn.disabled = true;
+      btn.innerText = "Sending...";
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(buildPayload())
+        });
+
+        if (!response.ok) throw new Error("Webhook responded with " + response.status);
+
+        showStep(7);
+      } catch (err) {
+        console.error("Onboarding submission failed:", err);
+        btn.disabled = false;
+        btn.innerText = "Send My Onboarding →";
+        document.getElementById("errorSubmit").style.display = "block";
+        const fallback = document.getElementById("fallbackLink");
+        fallback.href = buildMailtoLink();
+        fallback.style.display = "inline-block";
+      }
     }
 
     showStep(0);
